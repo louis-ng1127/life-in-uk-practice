@@ -7,7 +7,8 @@ const state = {
   session: [],
   index: 0,
   selected: new Set(),
-  revealed: false,
+  submitted: false,
+  answerVisible: false,
   correctThisSession: 0,
   answeredThisSession: 0,
   sessionWrongIds: new Set(),
@@ -103,7 +104,8 @@ function startWrongSession(ids = state.stats.wrongIds) {
 function renderQuestion() {
   const question = state.session[state.index];
   state.selected = new Set();
-  state.revealed = false;
+  state.submitted = false;
+  state.answerVisible = false;
 
   $("progressText").textContent = `${state.index + 1} / ${state.session.length}`;
   const score = state.answeredThisSession ? Math.round(state.correctThisSession / state.answeredThisSession * 100) : 0;
@@ -113,8 +115,10 @@ function renderQuestion() {
   $("questionType").textContent = question.answer.length > 1 ? `多选题 · 选${question.answer.length}项` : "单选题";
   $("questionText").textContent = question.text;
   $("selectionHint").textContent = question.answer.length > 1 ? `请选择${question.answer.length}个答案，再点击提交。` : "请选择一个答案，再点击提交。";
-  $("revealBtn").disabled = true;
-  $("revealBtn").classList.remove("hidden");
+  $("submitBtn").disabled = true;
+  $("submitBtn").classList.remove("hidden");
+  $("showAnswerBtn").classList.remove("hidden");
+  $("resultPanel").classList.add("hidden");
   $("answerPanel").classList.add("hidden");
   $("navigation").classList.add("hidden");
 
@@ -125,7 +129,8 @@ function renderQuestion() {
     button.type = "button";
     button.className = "option";
     button.dataset.id = option.id;
-    button.innerHTML = `<span class="option-key">${String.fromCharCode(65 + index)}</span><span></span>`;
+    const markerClass = question.answer.length > 1 ? "multi-mark" : "single-mark";
+    button.innerHTML = `<span class="option-key ${markerClass}">${String.fromCharCode(65 + index)}</span><span></span>`;
     button.lastElementChild.textContent = option.text;
     button.addEventListener("click", () => selectOption(option.id));
     options.appendChild(button);
@@ -133,7 +138,7 @@ function renderQuestion() {
 }
 
 function selectOption(id) {
-  if (state.revealed) return;
+  if (state.submitted) return;
   const question = state.session[state.index];
   if (question.answer.length === 1) {
     state.selected = new Set([id]);
@@ -143,17 +148,10 @@ function selectOption(id) {
     state.selected.add(id);
   }
   for (const button of $("options").children) button.classList.toggle("selected", state.selected.has(button.dataset.id));
-  $("revealBtn").disabled = state.selected.size === 0;
+  $("submitBtn").disabled = state.selected.size === 0;
 }
 
-function revealAnswer() {
-  if (state.revealed || !state.selected.size) return;
-  state.revealed = true;
-  const question = state.session[state.index];
-  const selected = [...state.selected].sort().join("");
-  const expected = [...question.answer].sort().join("");
-  const isCorrect = selected === expected;
-
+function recordResult(isCorrect, question) {
   state.answeredThisSession++;
   state.stats.attempts++;
   if (isCorrect) {
@@ -166,28 +164,61 @@ function revealAnswer() {
   }
   state.stats.answeredIds = [...new Set([...state.stats.answeredIds, question.id])];
   saveStats();
+}
+
+function submitAnswer({ reveal = false, unanswered = false } = {}) {
+  if (state.submitted) {
+    if (reveal) revealAnswer();
+    return;
+  }
+  if (!state.selected.size && !unanswered) return;
+
+  state.submitted = true;
+  const question = state.session[state.index];
+  const selected = [...state.selected].sort().join("");
+  const expected = [...question.answer].sort().join("");
+  const isCorrect = !unanswered && selected === expected;
+  recordResult(isCorrect, question);
 
   for (const button of $("options").children) {
-    const id = button.dataset.id;
-    button.classList.remove("selected");
-    if (question.answer.includes(id)) button.classList.add("correct");
-    else if (state.selected.has(id)) button.classList.add("incorrect");
+    button.classList.toggle("selected", state.selected.has(button.dataset.id));
     button.disabled = true;
   }
 
-  const letterFor = id => String.fromCharCode(65 + question.displayOptions.findIndex(option => option.id === id));
-  $("correctAnswer").textContent = question.answer.map(id => `${letterFor(id)}. ${question.options.find(o => o.id === id).text}`).join("；");
-  $("resultBanner").textContent = isCorrect ? "回答正确" : "回答错误";
+  $("resultBanner").textContent = isCorrect ? "回答正确" : unanswered ? "已查看答案，本题记为未答对" : "回答错误";
   $("resultBanner").className = `result-banner ${isCorrect ? "good" : "bad"}`;
-  $("explanation").textContent = question.explanation || "原题未提供解析。";
-  $("answerPanel").classList.remove("hidden");
-  $("revealBtn").classList.add("hidden");
+  $("resultPanel").classList.remove("hidden");
+  $("submitBtn").classList.add("hidden");
   $("navigation").classList.remove("hidden");
   $("nextBtn").textContent = state.index === state.session.length - 1 ? "查看本轮成绩" : "下一题";
 
   const score = Math.round(state.correctThisSession / state.answeredThisSession * 100);
   $("scoreText").textContent = `得分 ${score}%`;
   $("progressBar").style.width = `${(state.index + 1) / state.session.length * 100}%`;
+  if (reveal) revealAnswer();
+}
+
+function revealAnswer() {
+  if (state.answerVisible) return;
+  if (!state.submitted) {
+    submitAnswer({ reveal: true, unanswered: state.selected.size === 0 });
+    return;
+  }
+
+  state.answerVisible = true;
+  const question = state.session[state.index];
+  for (const button of $("options").children) {
+    const id = button.dataset.id;
+    button.classList.remove("selected");
+    if (question.answer.includes(id)) button.classList.add("correct");
+    else if (state.selected.has(id)) button.classList.add("incorrect");
+  }
+
+  const letterFor = id => String.fromCharCode(65 + question.displayOptions.findIndex(option => option.id === id));
+  $("correctAnswer").textContent = question.answer.map(id => `${letterFor(id)}. ${question.options.find(o => o.id === id).text}`).join("；");
+  $("explanation").textContent = question.explanation || "原题未提供解析。";
+  $("answerPanel").classList.remove("hidden");
+  $("showAnswerBtn").classList.add("hidden");
 }
 
 function nextQuestion() {
@@ -218,7 +249,8 @@ function wireEvents() {
   $("endQuestion").addEventListener("input", updateRange);
   $("startBtn").addEventListener("click", startRangeSession);
   $("wrongBtn").addEventListener("click", () => startWrongSession());
-  $("revealBtn").addEventListener("click", revealAnswer);
+  $("submitBtn").addEventListener("click", () => submitAnswer());
+  $("showAnswerBtn").addEventListener("click", revealAnswer);
   $("nextBtn").addEventListener("click", nextQuestion);
   $("exitBtn").addEventListener("click", goHome);
   $("homeBtn").addEventListener("click", goHome);
