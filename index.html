@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#173f35">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Life UK Quiz">
+  <title>Life in the UK Practice</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <header class="topbar">
+    <button id="homeBtn" class="brand" type="button" aria-label="返回设置">
+      <span class="brand-mark">UK</span>
+      <span><strong>Life in the UK</strong><small>Practice Studio</small></span>
+    </button>
+    <button id="installBtn" class="ghost hidden" type="button">安装到桌面</button>
+  </header>
+
+  <main>
+    <section id="setupView" class="view shell">
+      <div class="hero">
+        <p class="eyebrow">18 PRACTICE EXAMS</p>
+        <h1>按自己的节奏刷完<br><span>435 道题</span></h1>
+        <p>题目与答案来自原始 VCE 导出的 PDF。每次开始都会重新随机题目和选项。</p>
+      </div>
+
+      <div class="grid">
+        <article class="panel setup-panel">
+          <div class="panel-title">
+            <div><p class="eyebrow">NEW SESSION</p><h2>选择刷题范围</h2></div>
+            <span id="rangeCount" class="count-pill">435题</span>
+          </div>
+
+          <label class="all-toggle">
+            <input id="allQuestions" type="checkbox" checked>
+            <span>一键选择全部题目</span>
+          </label>
+
+          <div class="range-fields">
+            <label>从第几题<input id="startQuestion" type="number" min="1" max="435" value="1" inputmode="numeric"></label>
+            <span>—</span>
+            <label>到第几题<input id="endQuestion" type="number" min="1" max="435" value="435" inputmode="numeric"></label>
+          </div>
+
+          <button id="startBtn" class="primary" type="button">随机开始刷题</button>
+          <button id="wrongBtn" class="secondary" type="button">只刷错题 <span id="wrongCount">0</span></button>
+          <p id="setupMessage" class="message" role="status"></p>
+        </article>
+
+        <aside class="panel stats-panel">
+          <div class="panel-title"><div><p class="eyebrow">YOUR PROGRESS</p><h2>本机学习记录</h2></div></div>
+          <div class="stats-grid">
+            <div><strong id="attemptedStat">0</strong><span>已做题目</span></div>
+            <div><strong id="correctStat">0</strong><span>答对次数</span></div>
+            <div><strong id="accuracyStat">0%</strong><span>正确率</span></div>
+            <div><strong id="wrongStat">0</strong><span>当前错题</span></div>
+          </div>
+          <button id="resetStatsBtn" class="text-button" type="button">清除本机学习记录</button>
+          <p class="privacy-note">记录只保存在当前浏览器，不会上传。</p>
+        </aside>
+      </div>
+
+      <details class="pwa-help">
+        <summary>如何在 iPhone / iPad 离线使用？</summary>
+        <p>先用 Safari 打开网站，点击分享按钮，再选择“添加到主屏幕”。首次联网加载完成后，已缓存的题库可在没有网络时继续使用。</p>
+      </details>
+    </section>
+
+    <section id="quizView" class="view shell hidden">
+      <div class="quiz-head">
+        <button id="exitBtn" class="ghost" type="button">退出本轮</button>
+        <div class="progress-meta"><span id="progressText">1 / 1</span><strong id="scoreText">得分 0%</strong></div>
+      </div>
+      <div class="progress-track"><span id="progressBar"></span></div>
+
+      <article class="question-card">
+        <div class="question-meta">
+          <span id="sourceNumber">原题 #1</span>
+          <span id="questionType">单选题</span>
+        </div>
+        <h2 id="questionText"></h2>
+        <div id="options" class="options"></div>
+        <p id="selectionHint" class="selection-hint"></p>
+        <button id="revealBtn" class="primary" type="button">提交并显示答案</button>
+
+        <div id="answerPanel" class="answer-panel hidden" aria-live="polite">
+          <div id="resultBanner" class="result-banner"></div>
+          <p><strong>正确答案：</strong><span id="correctAnswer"></span></p>
+          <div id="explanationWrap"><strong>解析：</strong><p id="explanation"></p></div>
+        </div>
+
+        <div id="navigation" class="navigation hidden">
+          <button id="nextBtn" class="primary" type="button">下一题</button>
+        </div>
+      </article>
+    </section>
+
+    <section id="summaryView" class="view shell hidden">
+      <article class="panel summary-panel">
+        <p class="eyebrow">SESSION COMPLETE</p>
+        <h1>本轮完成</h1>
+        <div class="summary-score"><strong id="finalScore">0%</strong><span id="finalDetail">0 / 0</span></div>
+        <div class="summary-actions">
+          <button id="retryWrongBtn" class="primary" type="button">重刷本轮错题</button>
+          <button id="newSessionBtn" class="secondary" type="button">返回选择范围</button>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
