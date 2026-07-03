@@ -118,7 +118,6 @@ function renderQuestion() {
   $("submitBtn").disabled = true;
   $("submitBtn").classList.remove("hidden");
   $("showAnswerBtn").classList.remove("hidden");
-  $("resultPanel").classList.add("hidden");
   $("answerPanel").classList.add("hidden");
   $("navigation").classList.add("hidden");
 
@@ -185,9 +184,6 @@ function submitAnswer({ reveal = false, unanswered = false } = {}) {
     button.disabled = true;
   }
 
-  $("resultBanner").textContent = isCorrect ? "回答正确" : unanswered ? "已查看答案，本题记为未答对" : "回答错误";
-  $("resultBanner").className = `result-banner ${isCorrect ? "good" : "bad"}`;
-  $("resultPanel").classList.remove("hidden");
   $("submitBtn").classList.add("hidden");
   $("navigation").classList.remove("hidden");
   $("nextBtn").textContent = state.index === state.session.length - 1 ? "查看本轮成绩" : "下一题";

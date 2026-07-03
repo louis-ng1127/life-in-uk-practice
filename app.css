@@ -99,12 +99,8 @@ button { cursor: pointer; }
 .selection-hint { min-height: 20px; color: var(--muted); font-size: 13px; }
 .question-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .question-actions .secondary { margin-top: 0; }
-.result-panel { margin-top: 20px; }
 .answer-panel { margin-top: 12px; padding: 20px; border-radius: 16px; background: #f1eee6; line-height: 1.65; }
 .answer-panel p { margin-bottom: 0; }
-.result-banner { padding: 12px 20px; border-radius: 16px; font-weight: 900; }
-.result-banner.good { color: var(--good); background: #dff0e7; }
-.result-banner.bad { color: var(--bad); background: #f6dfdc; }
 .navigation { margin-top: 14px; }
 
 .summary-panel { max-width: 620px; margin: 8vh auto 0; text-align: center; }
