@@ -38,6 +38,14 @@ button { cursor: pointer; }
 .brand-mark { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 13px; background: var(--green); color: white; font-weight: 800; letter-spacing: -.03em; }
 .brand strong, .brand small { display: block; }
 .brand small { color: var(--muted); margin-top: 2px; }
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+.github-star {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 10px 14px; border-radius: 13px;
+  background: #24292f; color: white; font-weight: 800;
+  text-decoration: none; transition: transform .15s, background .15s;
+}
+.github-star:hover { background: #0d1117; transform: translateY(-1px); }
 
 .shell { width: min(1040px, calc(100% - 32px)); margin: 0 auto; padding: 54px 0 80px; }
 .hero { max-width: 720px; margin-bottom: 34px; }
@@ -115,6 +123,8 @@ button { cursor: pointer; }
   .hero h1 { font-size: 48px; }
   .panel { padding: 21px; }
   .topbar .ghost { font-size: 12px; }
+  .github-star { padding: 9px 11px; font-size: 12px; }
+  .github-star span { display: none; }
   .progress-meta { gap: 9px; font-size: 13px; }
   .question-card { border-radius: 20px; }
   .question-actions { grid-template-columns: 1fr; }
