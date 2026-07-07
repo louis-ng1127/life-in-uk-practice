@@ -108,8 +108,6 @@ function renderQuestion() {
   state.answerVisible = false;
 
   $("progressText").textContent = `${state.index + 1} / ${state.session.length}`;
-  const score = state.answeredThisSession ? Math.round(state.correctThisSession / state.answeredThisSession * 100) : 0;
-  $("scoreText").textContent = `得分 ${score}%`;
   $("progressBar").style.width = `${state.index / state.session.length * 100}%`;
   $("sourceNumber").textContent = `原题 #${question.id} · Exam ${question.exam} / Q${question.number}`;
   $("questionType").textContent = question.answer.length > 1 ? `多选题 · 选${question.answer.length}项` : "单选题";
@@ -188,8 +186,6 @@ function submitAnswer({ reveal = false, unanswered = false } = {}) {
   $("navigation").classList.remove("hidden");
   $("nextBtn").textContent = state.index === state.session.length - 1 ? "查看本轮成绩" : "下一题";
 
-  const score = Math.round(state.correctThisSession / state.answeredThisSession * 100);
-  $("scoreText").textContent = `得分 ${score}%`;
   $("progressBar").style.width = `${(state.index + 1) / state.session.length * 100}%`;
   if (reveal) revealAnswer();
 }

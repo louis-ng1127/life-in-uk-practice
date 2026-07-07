@@ -1,4 +1,4 @@
-const CACHE = "life-uk-quiz-v4";
+const CACHE = "life-uk-quiz-v5";
 const ASSETS = [
   "./", "./index.html", "./app.css", "./app.js", "./questions.json",
   "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png"
